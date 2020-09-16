@@ -1,49 +1,30 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 import './App.css';
 import CardList from '../components/CardList';
 import Scroll from '../components/Scroll';
 import SearchBox from '../components/SearchBox';
 import ErrorBoundry from '../components/ErrorBoundry';
+import { setSearchField, requestRobots } from '../actions';
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      robots: [],
-      searchfield: '',
-    };
+  componentDidMount() {
+    this.props.onRequestRobots();
   }
-
-  async componentDidMount() {
-    try {
-      const response = await fetch(
-        'https://jsonplaceholder.typicode.com/users'
-      );
-      const users = await response.json();
-
-      this.setState({ robots: users });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  onSearchChange = (event) => {
-    this.setState({ searchfield: event.target.value });
-  };
 
   render() {
-    const { robots, searchfield } = this.state;
+    const { robots, searchField, onSearchChange, isPending } = this.props;
     const filteredRobots = robots.filter((robot) =>
-      robot.name.toLowerCase().includes(searchfield.toLowerCase())
+      robot.name.toLowerCase().includes(searchField.toLowerCase())
     );
 
-    return !robots.length ? (
+    return isPending ? (
       <h1 className='tc'>Loading...</h1>
     ) : (
       <div className='tc'>
         <h1 className='f1'>RoboFriends</h1>
-        <SearchBox searchChange={this.onSearchChange} />
+        <SearchBox searchChange={onSearchChange} />
         <Scroll>
           <ErrorBoundry>
             <CardList robots={filteredRobots} />
@@ -53,4 +34,17 @@ class App extends Component {
     );
   }
 }
-export default App;
+
+const mapStateToProps = ({ searchRobots, requestRobots }) => ({
+  searchField: searchRobots.searchField,
+  robots: requestRobots.robots,
+  isPending: requestRobots.isPending,
+  error: requestRobots.error,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  onSearchChange: (event) => dispatch(setSearchField(event.target.value)),
+  onRequestRobots: () => dispatch(requestRobots()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
