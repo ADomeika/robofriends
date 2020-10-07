@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<CardList /> should render 1`] = `
+<div>
+  <Card
+    item={
+      Object {
+        "email": "test@test.com",
+        "id": 1,
+        "name": "Test Tester",
+        "username": "TeTester",
+      }
+    }
+    key="1"
+  />
+</div>
+`;
